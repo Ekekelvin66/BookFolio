@@ -1,11 +1,16 @@
 
 import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD, // Use the 16-character App Password
   },
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 export async function sendVerifyEmail(toEmail, token) {
   const verifyLink = `${process.env.VITE_URL}/verify-email?token=${token}`;
