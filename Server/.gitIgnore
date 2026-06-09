@@ -1,0 +1,4 @@
+.env
+migrations/
+current_schema.sql
+node_modules

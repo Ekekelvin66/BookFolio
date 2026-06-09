@@ -1,0 +1,20 @@
+:root {
+    --bg: #0F0E0C;
+    --surface: #1A1814;
+    --surface-alt: #242018;
+    --border: #2E2A22;
+    --primary: #C4873A;
+    --primary-hover: #D4974A;
+    --text: #E8E0D0;
+    --text-light: #A89880;
+    --muted: #6B6355;
+    --success: #5A8A5A;
+    --warning: #C4A035;
+    --error: #A05050;
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Inter', sans-serif;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+}
