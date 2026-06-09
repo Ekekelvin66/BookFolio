@@ -17,6 +17,29 @@ export const generateToken = (user) => {
 };
 
 
+// export const registerUser = asyncHandler(async (req, res) => {
+//   const { name, email, password } = req.body;
+//   if (!name || !email || !password) return res.json({ error: 'All fields must be filled' });
+//   if (password.length < 8) return res.json({ error: 'Password must be at least 8 characters' });
+
+//   const result = await db.query("SELECT id from users WHERE email = $1", [email.toLowerCase().trim()]);
+//   if (result.rows.length > 0) {
+//     return res.status(400).json({ error: "An account with this email already exists" });
+//   }
+
+//   const hashedPassword = await bcrypt.hash(password, SaltRounds);
+//   const token = crypto.randomBytes(32).toString('hex');
+//   const expiry = new Date(Date.now() + 3600000);
+
+//   await db.query(
+//     "INSERT INTO users (name, email, passwordhash, is_verified, verific_token, verific_token_expiry, onboarding_complete) VALUES ($1, $2, $3, false, $4, $5, false)",
+//     [name.trim(), email.toLowerCase().trim(), hashedPassword, token, expiry]
+//   );
+
+//   await sendVerifyEmail(email, token);
+//   res.status(201).json({ message: 'Check your email for a verify link!' });
+// });
+
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) return res.json({ error: 'All fields must be filled' });
@@ -36,8 +59,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     [name.trim(), email.toLowerCase().trim(), hashedPassword, token, expiry]
   );
 
-  await sendVerifyEmail(email, token);
+  // respond immediately
   res.status(201).json({ message: 'Check your email for a verify link!' });
+
+  // send email in background
+  sendVerifyEmail(email, token).catch((err) => {
+    console.error('Failed to send verification email:', err)
+  })
 });
 
 
