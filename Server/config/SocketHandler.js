@@ -152,10 +152,9 @@ export const registerSocketHandlers = (io) => {
 
     if (userId) {
       onlineUsers.set(userId, socket.id);
-      socket.join(`user_${userId}`); // REFACTOR: User joins global personal room
-      console.log(`Socket connected: ${socket.id} | user: ${userId}`);
+      socket.join(`user_${userId}`); 
     } else {
-      console.log(`Socket connected: ${socket.id} | unauthenticated`);
+     
     }
 
     socket.on('join_conversation', (conversationId) => {
