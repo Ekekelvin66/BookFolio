@@ -361,7 +361,13 @@
   line-height: 1;
   pointer-events: none;
 }
-
+@media (max-width: 768px) {
+  .navbar .book-combobox {
+    flex: 1;
+    min-width: 0;
+    max-width: unset;
+  }
+}
 
 /* =============================================================
    AUTH LAYOUT

@@ -1063,6 +1063,56 @@ body > .spinner {
 }
 .book-combobox__footer:hover { background: var(--surface-high); }
 
+/* Make combobox take available space on mobile */
+@media (max-width: 768px) {
+
+  /* Break dropdown out of navbar constraints */
+  .book-combobox__dropdown {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 300;
+  }
+
+  /* Tighten up items on mobile */
+  .book-combobox__item {
+    height: auto;
+    min-height: 56px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Prevent title overflow */
+  .book-combobox__title {
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .book-combobox__author {
+    font-size: 0.6875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Smaller cover on mobile */
+  .book-combobox__cover-wrap {
+    width: 1.75rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  /* Hide badge on mobile to save space */
+  .book-combobox__badge {
+    display: none;
+  }
+}
 
 /* ── GENRE DROPDOWN ──────────────────────────────────────── */
 .genre-dropdown { position: relative; }
