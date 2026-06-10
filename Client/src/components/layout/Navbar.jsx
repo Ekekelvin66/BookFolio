@@ -11,8 +11,6 @@ import GenreDropdown from "../ui/Genredropdown";
 const HIDE_SEARCH = ['/messages','/clubs', '/notifications', '/settings', '/reviews','/books','/search']
 
 
- 
-
 const NavBar = ({user,className,onMenuClick})=>{
    const location = useLocation();
    const navigate= useNavigate();

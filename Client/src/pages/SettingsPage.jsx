@@ -21,9 +21,11 @@ const validateUsername = (username) => {
 const SettingsPage = ({isOnboarding=false}) => {
   const { user,updateUser,login } = useAuthContext()
   const navigate =useNavigate()
-  const { getProfile, updateProfile, getPreferences, savePreferences,updatePreferences, setReadingGoal, loading } = useUser()
+  const { getProfile, updateProfile, getPreferences, savePreferences,updatePreferences, setReadingGoal } = useUser()
   const { showToast } = useToast()
 
+
+  const [pageLoading,setPageLoading] =useState(true)
   const [name, setName] = useState(user.name??'')
   const [username,setUsername]=useState('')
   const [genres,setGenres]=useState([])
@@ -55,6 +57,7 @@ const SettingsPage = ({isOnboarding=false}) => {
         setSelectedGenres(genres.map((g) => g.id ?? g))
       }
        setGenres(genresResult.data.genres ?? genresResult.data ?? [])
+       setPageLoading(false)
     }
 
     fetchData()
@@ -136,7 +139,7 @@ const SettingsPage = ({isOnboarding=false}) => {
         showToast(result.error, 'error')
     }
   }
-  if (loading) return <Spinner />
+  if (pageLoading) return <Spinner />
 
   return (
     <PageWrapper className="settings-page">
@@ -256,9 +259,9 @@ const SettingsPage = ({isOnboarding=false}) => {
         <button
           className="settings-page__onboarding-submit"
           onClick={handleOnboardingComplete}
-          disabled={loading}
+          disabled={pageLoading}
         >
-          {loading ? 'Setting up…' : 'Enter the Library →'}
+          {pageLoading ? 'Setting up…' : 'Enter the Library →'}
         </button>
       )}
     </PageWrapper>
