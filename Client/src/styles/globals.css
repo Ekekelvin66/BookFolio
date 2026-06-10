@@ -940,6 +940,7 @@ body > .spinner {
   padding: 0.25rem 2.5rem 0.25rem 2.5rem;
   outline: none;
   transition: border-color var(--transition-fast);
+  direction: ltr;
 }
 
 .book-combobox__input:focus {
@@ -987,8 +988,7 @@ body > .spinner {
 .book-combobox__item {
   display: flex;
   align-items: center;
-  flex-shrink: 0; /* CRITICAL: Prevents the image from being squished */
-    /* Force a uniform width */
+  flex-shrink: 0;
   height: 60px;
   gap: 0.75rem;
   padding: 0.625rem 0.875rem;
@@ -1063,29 +1063,24 @@ body > .spinner {
 }
 .book-combobox__footer:hover { background: var(--surface-high); }
 
-/* Make combobox take available space on mobile */
+/* ── Tablet (flows naturally below input) ── */
 @media (max-width: 768px) {
-
-  /* Break dropdown out of navbar constraints */
   .book-combobox__dropdown {
-    position: fixed;
-    top: var(--navbar-height);
-    left: 0.75rem;
-    right: 0.75rem;
-    width: auto;
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    left: 0;
+    right: 0;
     max-height: 60vh;
     overflow-y: auto;
     z-index: 300;
   }
 
-  /* Tighten up items on mobile */
   .book-combobox__item {
     height: auto;
     min-height: 56px;
     padding: 0.5rem 0.75rem;
   }
 
-  /* Prevent title overflow */
   .book-combobox__title {
     font-size: 0.8125rem;
     white-space: nowrap;
@@ -1101,16 +1096,28 @@ body > .spinner {
     text-overflow: ellipsis;
   }
 
-  /* Smaller cover on mobile */
   .book-combobox__cover-wrap {
     width: 1.75rem;
     height: 2.5rem;
     flex-shrink: 0;
   }
 
-  /* Hide badge on mobile to save space */
   .book-combobox__badge {
     display: none;
+  }
+}
+
+/* ── Phone (fixed below mobile search row) ── */
+@media (max-width: 480px) {
+  .book-combobox__dropdown {
+    position: fixed;
+    top: calc(var(--navbar-height) + 3.25rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    max-height: 55vh;
+    overflow-y: auto;
+    z-index: 300;
   }
 }
 

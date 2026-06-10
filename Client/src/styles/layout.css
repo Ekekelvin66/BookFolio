@@ -281,7 +281,8 @@
   flex-shrink: 0;
 }
 
-.navbar__hamburger {
+.navbar__hamburger,
+.navbar__mobile-search-toggle {
   display: none;
   width: 2rem;
   height: 2rem;
@@ -292,23 +293,14 @@
   border: 0.5px solid var(--outline-mid);
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-.navbar__hamburger:hover { background: var(--surface-container); color: var(--on-surface); }
+.navbar__hamburger:hover,
+.navbar__mobile-search-toggle:hover { background: var(--surface-container); color: var(--on-surface); }
 
-@media (max-width: 768px) {
-  .navbar__hamburger { display: flex; }
-}
-
-.navbar__title {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--on-surface);
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
-/* Search combobox grows in the middle */
-.navbar .book-combobox {
+/* Desktop search */
+.navbar__desktop-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex: 1;
   max-width: 400px;
 }
@@ -361,13 +353,45 @@
   line-height: 1;
   pointer-events: none;
 }
-@media (max-width: 768px) {
-  .navbar .book-combobox {
-    flex: 1;
-    min-width: 0;
-    max-width: unset;
-  }
+
+/* ── Mobile Search Row ── */
+.navbar__mobile-search-row {
+  position: absolute;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--outline-fine);
+  z-index: 199;
 }
+
+.navbar__mobile-search-inner {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.navbar__mobile-search-cancel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Responsive constraints */
+@media (max-width: 768px) {
+  .navbar__hamburger{display: flex;}
+}
+
+@media (max-width: 480px) {
+  .navbar__mobile-search-toggle { display: flex; }
+  .navbar__desktop-search { display: none; }
+}
+
 
 /* =============================================================
    AUTH LAYOUT
