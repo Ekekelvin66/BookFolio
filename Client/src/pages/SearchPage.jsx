@@ -153,7 +153,6 @@ const SearchPage = () => {
 
         <div className="search-page__search-container">
           <SearchBar
-            
             value={textInput}
             placeholder="Search by title or author..."
             className="search-page__combobox"

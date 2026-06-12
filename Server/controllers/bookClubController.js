@@ -121,7 +121,6 @@ export const getClubs = asyncHandler(async (req, res) => {
     LEFT JOIN club_members cm ON cm.club_id = bc.id
     LEFT JOIN club_reading_list crl ON crl.club_id = bc.id AND crl.is_current = TRUE
     LEFT JOIN books b ON b.id = crl.book_id
-    WHERE bc.is_private = FALSE
       AND ($2::text IS NULL OR bc.genre ILIKE $2)
       AND ($3::text IS NULL OR bc.name ILIKE $3 OR bc.description ILIKE $3 OR bc.genre ILIKE $3)
     GROUP BY bc.id, b.id

@@ -5,9 +5,17 @@ export const getDashboard = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
   const pagesResult = await db.query(`
-    SELECT COALESCE(SUM(user_shelves.total_pages), 0) AS total_pages_read
+    SELECT 
+      COALESCE(SUM(
+        CASE 
+          WHEN status = 'completed' THEN total_pages
+          WHEN status = 'reading' THEN current_page
+          ELSE 0
+        END
+      ), 0) AS total_pages_read
     FROM user_shelves
-    WHERE user_id = $1 AND status = 'completed'
+    WHERE user_id = $1
+    AND status IN ('completed', 'reading')
   `, [userId]);
 
   const goalResult = await db.query(`

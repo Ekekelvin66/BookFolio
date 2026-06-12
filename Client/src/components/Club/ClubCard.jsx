@@ -27,11 +27,7 @@ const ClubCard = ({
 
   const handleJoinClick = (e) => {
     e.preventDefault()
-    if (is_private) {
-      onRequest?.(id)
-    } else {
-      onJoin?.(id)
-    }
+     onJoin?.(id,is_private)
   }
 
   const joinLabel = () => {
