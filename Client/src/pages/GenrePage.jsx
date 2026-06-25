@@ -72,7 +72,7 @@ const GenrePage = () => {
     }
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='lg' />
 
   if (notFound) {
     return (
@@ -110,14 +110,14 @@ const GenrePage = () => {
         </section>
       ) : (
         <p className="genre-page__empty">
-          No community reviews for this genre yet.
+          No community books for  this genre yet.
         </p>
       )}
 
       {discovery.length > 0 && (
         <section className="genre-page__section">
           <h2 className="genre-page__section-title">Discover More {genre?.name}</h2>
-          <div className="genre-page__strip">
+          <div className="genre-page__grid">
             {discovery.map((book, i) => (
               <BookCard key={book.googleBooksId ?? i} book={book} variant="minimal" />
             ))}

@@ -7,6 +7,7 @@ import PageWrapper from '../components/layout/PageWrapper'
 import BookCard from '../components/book/BookCard'
 import SearchBar from '../components/ui/SearchBar'
 import api from '../utils/api'
+import { ArrowLeft } from 'lucide-react'
 import clsx from 'clsx'
 import Button from '../components/ui/Button'
 
@@ -136,11 +137,12 @@ const SearchPage = () => {
   return (
     <PageWrapper className="search-page">
       <button 
-        onClick={()=>navigate('/home')} 
+        onClick={()=>navigate(-1)} 
         className="genre-page__back"
         
       >
-        Go back
+        
+       <ArrowLeft size='16'/> Go back
       </button>
       <div className="search-page__hero">
         <h1 className="search-page__title">
@@ -192,7 +194,7 @@ const SearchPage = () => {
         </div>
       </div>
 
-      {loading && <Spinner />}
+      {loading && <Spinner fullPage size ='lg'/>}
 
       {!loading && searched && results.length === 0 && (
         <div className="search-page__empty-container">

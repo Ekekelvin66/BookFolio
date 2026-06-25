@@ -20,7 +20,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [errors, setErrors] = useState({})
-  const [activeTab, setActiveTab] = useState('google')
+  const [activeTab, setActiveTab] = useState('email')
 
   const validate = () => {
     const newErrors = {}
@@ -58,10 +58,10 @@ const Register = () => {
     }
 
     showToast('Check your email to verify your account', 'success')
-    navigate(`/verify-email?resend=true&email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirect)}`)
+    navigate(`/verify-email?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirect)}`)
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='lg'/>
 
   return (
     <div className="auth">

@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../hooks/useUser'
 import { useAuthContext } from '../context/AuthContext'
+import { useUsernameAvailability } from '../hooks/useUsernameAvailability'
 import { useToast } from '../context/ToastContext'
 import Spinner from '../components/ui/Spinner'
 import PageWrapper from '../components/layout/PageWrapper'
 import Input from '../components/ui/Input'
-import { User, BookOpen, Target } from 'lucide-react'
+import { User, BookOpen, Target,Check,X,Loader2 } from 'lucide-react'
 import api from '../utils/api'
+import clsx from 'clsx'
 
 
 const validateUsername = (username) => {
@@ -21,7 +23,7 @@ const validateUsername = (username) => {
 const SettingsPage = ({isOnboarding=false}) => {
   const { user,updateUser,login } = useAuthContext()
   const navigate =useNavigate()
-  const { getProfile, updateProfile, getPreferences, savePreferences,updatePreferences, setReadingGoal } = useUser()
+  const { getProfile, updateProfile, getPreferences, savePreferences,updatePreferences, setReadingGoal,checkUsername } = useUser()
   const { showToast } = useToast()
 
 
@@ -35,6 +37,7 @@ const SettingsPage = ({isOnboarding=false}) => {
   const [savingProfile, setSavingProfile] = useState(false)
   const [savingPrefs, setSavingPrefs] = useState(false)
   const [savingGoal, setSavingGoal] = useState(false)
+  const { status: usernameStatus, message: usernameMessage } = useUsernameAvailability(username, user.username, checkUsername)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,7 +142,7 @@ const SettingsPage = ({isOnboarding=false}) => {
         showToast(result.error, 'error')
     }
   }
-  if (pageLoading) return <Spinner />
+  if (pageLoading) return <Spinner fullPage size='lg'/>
 
   return (
     <PageWrapper className="settings-page">
@@ -163,13 +166,23 @@ const SettingsPage = ({isOnboarding=false}) => {
             placeholder="Your name"
             fullWidth
           />
-           <Input
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="@yourhandle"
-            fullWidth
-          />
+          <div className="username-field">
+            <Input
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="@yourhandle"
+              fullWidth
+            />
+            {usernameStatus === 'checking' && <Loader2 size={16} className="username-status__icon spin" />}
+            {usernameStatus === 'available' && <Check size={16} className="username-status__icon username-status__icon--ok" />}
+            {usernameStatus === 'taken' && <X size={16} className="username-status__icon username-status__icon--bad" />}
+            {usernameMessage && (
+              <p className={clsx('username-status__message', usernameStatus === 'taken' && 'is-error')}>
+                {usernameMessage}
+              </p>
+            )}
+          </div>
           <div className="settings-page__field">
             <label className="settings-page__label">Bio</label>
             <textarea
@@ -187,7 +200,7 @@ const SettingsPage = ({isOnboarding=false}) => {
           <button
             className="settings-page__save-btn"
             onClick={handleSaveProfile}
-            disabled={savingProfile}
+            disabled={savingProfile || usernameStatus === 'checking' || usernameStatus === 'taken'}
           >
             {savingProfile ? 'Saving…' : 'Save Profile'}
           </button>
@@ -256,10 +269,10 @@ const SettingsPage = ({isOnboarding=false}) => {
         </div>
       </section>
       {isOnboarding && (
-        <button
+       <button
           className="settings-page__onboarding-submit"
           onClick={handleOnboardingComplete}
-          disabled={pageLoading}
+          disabled={pageLoading || usernameStatus === 'checking' || usernameStatus === 'taken'}
         >
           {pageLoading ? 'Setting up…' : 'Enter the Library →'}
         </button>

@@ -65,7 +65,7 @@ const ClubActivityPage = () => {
 
       <div className="club-activity-page__body">
         {loading && feedItems.length === 0 ? (
-          <Spinner />
+          <Spinner size='md' />
         ) : (
           <div className="club-activity-page__feed">
             {feedItems.map((item) => (

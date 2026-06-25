@@ -30,7 +30,7 @@ const MyClubsTab = () => {
     fetch()
   }, [])
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='lg' />
 
   if (clubs.length === 0) {
     return (

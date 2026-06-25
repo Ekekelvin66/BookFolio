@@ -7,7 +7,8 @@ import {
     setReadingGoal,
     getPreferences,
     getProfile,
-    getPublicProfile } from '../controllers/UserController.js'
+    getPublicProfile,
+    checkUsername} from '../controllers/UserController.js'
     import { uploadAvatar } from '../config/cloudinary.js';
 const router=express.Router();
 
@@ -22,4 +23,5 @@ router.get('/user/preferences',getPreferences)
 router.post('/user/preferences',savePreferences)
 router.patch('/user/preferences',updatePreferences)
 router.get('/users/:userId', getPublicProfile)
+router.get('/user/check-username',checkUsername);
 export default router

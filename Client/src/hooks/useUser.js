@@ -35,10 +35,13 @@ export const useUser = () => {
 
     const getProfile = () => handleRequest((signal) => api.get('/user', { signal }), 'Failed to fetch your profile', 'profile')
     const getPublicProfile = (userId) => handleRequest((signal) => api.get(`/users/${userId}`, { signal }), 'Failed to fetch user profile', `public_profile_${userId}`)
+    const checkUsername = (username) => handleRequest(
+        (signal) => api.get('/user/check-username', { params: { username }, signal }),
+        'Failed to check username',
+        'check_username'
+    )
     const updateProfile = async (fields) => {
         const result = await handleRequest((signal) => api.patch('/user', fields, { signal }), 'Failed to update profile', 'update_profile')
-          console.log('result.data:', result.data)           // what shape is this?
-  console.log('result.data.user:', result.data?.user)
         if (result.success) updateUser(result.data.user??result.data)
         return result
     }
@@ -61,5 +64,5 @@ export const useUser = () => {
       return result
     }
 
-    return { getProfile,getPublicProfile, updateProfile, removeAvatar, getPreferences, savePreferences, updatePreferences, setReadingGoal, loading, error }
+    return { getProfile,getPublicProfile, updateProfile, removeAvatar, getPreferences, savePreferences, updatePreferences, setReadingGoal,checkUsername, loading, error }
 }

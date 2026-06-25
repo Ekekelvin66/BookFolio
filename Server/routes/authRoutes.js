@@ -22,8 +22,8 @@ router.post('/logout',logoutUser)
 router.post('/forgot-password',authLimiter,ForgotPassword)
 router.post('/reset-password',authLimiter,setNewPassword)
 
-router.get('/verify',verifyUser)
-router.post('/resend-verification', resendVerification);
+router.post('/verify',authLimiter,verifyUser)
+router.post('/resend-verification',authLimiter, resendVerification);
 
 router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })

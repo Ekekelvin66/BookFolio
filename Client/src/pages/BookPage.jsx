@@ -267,8 +267,7 @@ const BookPage = () => {
       showToast(result.error, 'error')
     }
   }
-
-  if (loading) return <Spinner />
+if (loading) return <Spinner fullPage size='lg' />
   if (!book)   return <PageWrapper><p className="book-page__not-found">Book not found.</p></PageWrapper>
 
   const avgRating = reviews.length

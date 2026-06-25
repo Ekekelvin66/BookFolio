@@ -1,4 +1,3 @@
-// useMessages.js
 import { useState, useRef } from "react";
 import api from "../utils/api";
 

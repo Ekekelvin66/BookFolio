@@ -137,7 +137,7 @@ const ClubPage = () => {
     }
   }
 
-  if (clubLoading || !club) return <Spinner />
+  if (clubLoading || !club) return <Spinner fullPage size='lg' />
 
   const isOwner        = club.my_role === 'owner'
   const isMember       = club.is_member

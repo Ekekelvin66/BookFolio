@@ -19,7 +19,7 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [unverified, setUnverified] = useState(null)
-  const [activeTab, setActiveTab] = useState('google')
+  const [activeTab, setActiveTab] = useState('email')
   const redirect=searchParams.get('redirect') ?? ''
 
   const handleSubmit = async (e) => {
@@ -48,7 +48,7 @@ const Login = () => {
     navigate(redirect || '/home',{replace:true})
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='md'/>
 
   return (
     <div className="auth">

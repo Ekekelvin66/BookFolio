@@ -2,15 +2,18 @@ import { BrowserRouter,Route,Routes,Navigate } from 'react-router-dom'
 import { useAuthContext } from './context/AuthContext'
 import AppLayout from './components/layout/AppLayout'
 import AuthLayout from './components/layout/AuthLayout'
+import LandingPageLayout from './components/layout/LandingPagesLayout'
 import LandingLayout from './components/layout/LandingLayout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import GuestRoute from './components/layout/GuestRoute'
 import BookPage from './pages/BookPage'
 import DashBoard from './pages/DashboardPage'
+import BestsellersPage from './pages/BestsellersPage'
 import Landing from './pages/LandingPage';
 import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
 import VerifyEmail from './pages/VerifyEmailPage';
+import EditorsPicksPage from './pages/EditorsPicksPage'
 import ForgotPassword from './pages/ForgotPasswordPage';
 import ResetPassword from './pages/ResetPasswordPage';
 import OAuthCallback from './pages/OAuthCallback';
@@ -32,7 +35,7 @@ import ClubActivityPage from './pages/ClubActivityPage'
 
  const SmartLayout = () => {
   const { isAuthenticated } = useAuthContext();
-  return isAuthenticated ? <AppLayout /> : <LandingLayout />;
+  return isAuthenticated ? <AppLayout /> : <LandingPageLayout />;
 };
 
 function App() {
@@ -68,7 +71,8 @@ function App() {
               <Route index element={<ClubsPage />} />
               <Route path=":clubId" element={<ClubPage />} /> 
             </Route>
-          
+           <Route path='/editors-picks' element={<EditorsPicksPage/>} />
+            <Route path='/bestsellers' element={<BestsellersPage/>} />
         </Route>
         
         <Route element={<AppLayout />}>

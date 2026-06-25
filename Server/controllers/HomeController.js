@@ -1,9 +1,9 @@
 import { db } from '../config/db.js';
 import { searchBooks } from '../services/googleBookCache.js';  
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { fetchBestsellers } from './BestsellerController.js';
 
 const RECOMMENDATION_THRESHOLD = 10;
-
 
 export const getGuestHomeEssential = asyncHandler(async (req, res) => {
   const communityBooks = await db.query(`
@@ -12,9 +12,10 @@ export const getGuestHomeEssential = asyncHandler(async (req, res) => {
       COUNT(reviews.id) AS review_count
     FROM books
     LEFT JOIN reviews ON books.id = reviews.book_id
+    WHERE books.is_featured = true
     GROUP BY books.id
-    ORDER BY COUNT(reviews.id) DESC, ROUND(AVG(reviews.rating), 1) DESC
-    LIMIT 3
+    ORDER BY books.id
+    LIMIT 8
   `);
 
   res.json({
@@ -28,13 +29,13 @@ export const getGuestHomeExtended = asyncHandler(async (req, res) => {
 
   const [trendingBooks, bestsellers] = await Promise.all([
       searchBooks('', randomGenre),
-      searchBooks('', 'bestsellers')
+      fetchBestsellers()
   ]);
 
   res.json({
     trendingBooks,
     trendingGenre: randomGenre,
-    bestsellers,
+    bestsellers
   });
 });
 
@@ -179,4 +180,23 @@ export const getAuthHomeExtended = asyncHandler(async (req, res) => {
     recommendationReady:     true,
     reviewsUntilRecommendations: 0,
   });
+});
+
+export const getEditorsPicks = asyncHandler(async (req, res) => {
+  const result = await db.query(`
+    SELECT
+      books.id, books.title, books.author, books.cover_url,
+      books.page_count, books.publish_year,
+      books.average_rating AS google_rating,
+      books.ratings_count AS google_ratings_count,
+      ROUND(AVG(reviews.rating), 1) AS community_rating,
+      COUNT(DISTINCT reviews.id) AS review_count
+    FROM books
+    LEFT JOIN reviews ON books.id = reviews.book_id
+    WHERE books.is_featured = true
+    GROUP BY books.id
+    ORDER BY books.title
+  `);
+
+  res.json({ books: result.rows });
 });

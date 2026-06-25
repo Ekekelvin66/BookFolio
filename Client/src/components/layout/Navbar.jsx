@@ -9,7 +9,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import GenreDropdown from "../ui/Genredropdown";
 
 
-const HIDE_SEARCH = ['/messages', '/clubs', '/notifications', '/settings', '/reviews', '/books', '/search'];
+const HIDE_SEARCH = ['/messages', '/clubs', '/notifications', '/settings', '/reviews',  '/search'];
 
 
 const NavBar = ({ user, className, onMenuClick }) => {

@@ -116,7 +116,7 @@ const HomePage = () => {
     }
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='lg' />
 
   const currentQuote = QUOTES[quoteIndex]
 

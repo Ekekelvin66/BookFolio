@@ -202,7 +202,7 @@ const ClubSettingsPage = () => {
     }
   }
 
-  if (loading || !club) return <Spinner />
+  if (loading || !club) return <Spinner fullPage size='md' />
 
   return (
     <PageWrapper className="club-settings-page">
@@ -210,7 +210,7 @@ const ClubSettingsPage = () => {
       
       <div className="club-settings-page__header">
         <Link to={`/clubs/${clubId}`} className="club-settings-page__back">
-          <ArrowLeft size={15} /> Back to Club
+          <ArrowLeft size={15} />
         </Link>
         <h1 className="club-settings-page__title">Club Settings</h1>
       </div>

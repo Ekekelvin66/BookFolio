@@ -24,7 +24,7 @@ const OAuthCallback = () => {
     }
   }, [])
 
-  return <Spinner />
+  return <Spinner fullPage size='lg'/>
 }
 
 export default OAuthCallback

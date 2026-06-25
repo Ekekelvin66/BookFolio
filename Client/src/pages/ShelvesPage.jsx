@@ -148,7 +148,7 @@ const handleReadAgain = async (bookId) => {
     }
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='lg' />
 
   const filteredReading = filterBooks(currentlyReading)
   const filteredWant = filterBooks(wantToRead)

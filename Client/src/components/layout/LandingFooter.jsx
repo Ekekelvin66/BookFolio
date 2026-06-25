@@ -40,10 +40,10 @@ const footerColumns = [
 const LandingFooter = ({ className }) => {
   return (
     <footer className={clsx('landing-footer', className)}>
-      <div className="landing-footer__brand">
+      {/* <div className="landing-footer__brand">
         <Logo className="landing-footer__logo" />
         <p className="landing-footer__tagline">The modern day digital library</p>
-      </div>
+      </div> */}
 
       <div className="landing-footer__columns">
         {footerColumns.map((col) => (
@@ -61,8 +61,25 @@ const LandingFooter = ({ className }) => {
           </div>
         ))}
       </div>
+      <div className="landing-footer__bottom-left">
+              <Logo className="landing-footer__logo"/>
+              <p className="landing-footer__copyright">
+                © {new Date().getFullYear()} BookFolio. All rights reserved.
+              </p>
+              <p className="landing-footer__attribution">
+                Book data provided by{' '}
+                <a
+                  href="https://books.google.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="landing-footer__attribution-link"
+                >
+                  Google Books API
+                </a>
+              </p>
+            </div>
 
-      <AppFooter />
+      {/* <AppFooter /> */}
     </footer>
   )
 }

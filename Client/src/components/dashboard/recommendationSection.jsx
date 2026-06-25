@@ -1,15 +1,16 @@
 import clsx from 'clsx'
 import BookCard from '../book/BookCard'
 import { Link } from 'react-router-dom'
+import Carousel from '../ui/Carousel'
 
 const TOTAL_REVIEWS_NEEDED = 10
 
 const BookStrip = ({ books = [] }) => (
-  <div className="rec-section__strip">
+  <Carousel className="rec-section__strip">
     {books.slice(0,6).map((book) => (
       <BookCard key={book.googleBooksId ?? book.id} book={book} variant="minimal" />
     ))}
-  </div>
+  </Carousel>
 )
 
 const RecommendationSection = ({

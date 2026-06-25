@@ -104,7 +104,7 @@ const ReviewPage = () => {
     }
   }
 
-  if (bookLoading) return <Spinner />
+  if (bookLoading) return <Spinner fullPage size='lg' />
   if(!bookId) return(
     <PageWrapper>
         <p>No book selected. <Link to='/search'>Find a book to review</Link></p>

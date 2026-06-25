@@ -137,7 +137,7 @@ const handleRemoveAvatar = async () => {
   }
 }
 
-  if (loading || !profile) return <Spinner />
+  if (loading || !profile) return <Spinner fullPage size='lg'/>
 
   return (
     <PageWrapper className="profile-page">

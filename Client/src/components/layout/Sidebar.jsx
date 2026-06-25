@@ -5,6 +5,7 @@ import {
   MessageSquare,
   Home,
   LogOut,
+  Users2,
   BookMarked,
 } from 'lucide-react'
 import clsx from 'clsx'
@@ -23,8 +24,9 @@ const navGroups = [
   {
     label: 'Community',
     links: [
+      {label:'Editors Picks',path:'/editors-picks',icon:BookOpen},
       { label: 'Messages', path: '/messages', icon: MessageSquare },
-      {label:'Book Clubs',path:'/clubs',icon: BookOpen}
+      {label:'Book Clubs',path:'/clubs',icon: Users2}
     ],
   },
 ]

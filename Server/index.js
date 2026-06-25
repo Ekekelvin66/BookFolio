@@ -15,6 +15,7 @@ import bookClubRoutes from './routes/bookClubRoutes.js'
 import dashboardRoutes from './routes/dashboardRoutes.js'
 import { apiLimiter } from './middlewares/rateLimiter.js'
 import homeRoutes from './routes/homeRoutes.js'
+import bestsellerRoutes from './routes/bestsellerRoutes.js'
 import { handleUploadError } from './config/cloudinary.js'
 
 import passport from './config/passport.js';
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 app.use('/api',authRoutes)
 app.use('/api',apiLimiter,bookRoutes)
 app.use('/api',apiLimiter,homeRoutes)
+app.use('/api',apiLimiter,bestsellerRoutes)
 app.use('/api',requireAuth,apiLimiter,reviewRoutes)
 app.use('/api',requireAuth,apiLimiter,userRoutes)
 app.use('/api/',requireAuth,apiLimiter,dashboardRoutes)

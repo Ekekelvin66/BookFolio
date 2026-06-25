@@ -170,6 +170,34 @@ export const removeAvatar = asyncHandler(async (req, res) => {
   res.json({ user: freshUser, token: newToken })
 })
 
+// controllers/userController.js
+export const checkUsername = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+
+  const trimmed = username.trim();
+
+  if (trimmed.length < 3 || trimmed.length > 30) {
+    return res.json({ available: false, reason: 'Username must be 3-30 characters' });
+  }
+
+  if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
+    return res.json({ available: false, reason: 'Only letters, numbers, and underscores allowed' });
+  }
+
+  const existing = await db.query(
+    `SELECT id FROM users WHERE username = $1 AND id != $2`,
+    [trimmed, userId]
+  );
+
+  res.json({ available: existing.rows.length === 0 });
+});
+
+
 export const savePreferences = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { genres } = req.body;

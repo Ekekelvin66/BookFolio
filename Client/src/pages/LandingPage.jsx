@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Star, Search, BookMarked, Users, ChevronDown } from 'lucide-react'
+import { ArrowRight, Star, Search, BookMarked, Users, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useHome } from '../hooks/useHome'
 import Spinner from '../components/ui/Spinner'
 import BookCard from '../components/book/BookCard'
@@ -16,7 +16,12 @@ const AUTHOR_OF_MONTH = {
   image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Chimamanda_Ngozi_Adichie_2015.jpg/440px-Chimamanda_Ngozi_Adichie_2015.jpg',
   quote: 'The single story creates stereotypes, and the problem with stereotypes is not that they are untrue, but that they are incomplete.',
   bio: 'Nigerian author of novels, nonfiction and short stories. Known for works exploring the African experience.',
-  works: ['Purple Hibiscus', 'Half of a Yellow Sun', 'Americanah', 'We Should All Be Feminists'],
+  works: [
+    { title: 'Purple Hibiscus',          googleId: 'U9gzoaoqF2MC' },
+    { title: 'Half of a Yellow Sun',     googleId: 'IPAFvwEACAAJ' },
+    { title: 'Americanah',               googleId: 'fDqTEAAAQBAJ' },
+    { title: 'We Should All Be Feminists', googleId: 'ZMmxzgEACAAJ' },
+  ],
 }
 
 const JOURNEY_STEPS = [
@@ -40,13 +45,16 @@ const JOURNEY_STEPS = [
 const LandingPage = () => {
   const navigate = useNavigate()
   const { getGuestHomeEssential, getGuestHomeExtended, loading, loadingExtended } = useHome()
+  const trendingRef = useRef(null)
 
+  const [canScrollPrev, setCanScrollPrev] = useState(false)
+  const [canScrollNext, setCanScrollNext] = useState(false)
   const [clubs]=useState([])
   const [communityBooks, setCommunityBooks] = useState([])
   const [trendingBooks, setTrendingBooks] = useState([])
   const [trendingGenre, setTrendingGenre] = useState('')
   const [bestsellers, setBestsellers] = useState([])
-
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       const essential = await getGuestHomeEssential()
@@ -65,16 +73,31 @@ const LandingPage = () => {
   }, [])
   
 
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-
   const handleSearch = (query) => {
     navigate(`/search?query=${encodeURIComponent(query)}`)
+  }
+  const updateScrollState = () => {
+    const el = trendingRef.current
+    if (!el) return
+    setCanScrollPrev(el.scrollLeft > 4)
+    setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
+  }
+
+  useEffect(() => {
+    updateScrollState()
+  }, [trendingBooks])
+
+  const scrollTrending = (direction) => {
+    const el = trendingRef.current
+    if (!el) return
+    const amount = el.clientWidth * 0.85
+    el.scrollBy({ left: direction === 'next' ? amount : -amount, behavior: 'smooth' })
   }
 
   const featuredBook = communityBooks[0] ?? null
   const secondaryBooks = communityBooks.slice(1, 3)
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size='lg' />
 
   return (
     <div className="landing">
@@ -150,13 +173,8 @@ const LandingPage = () => {
         <section className="landing-section">
           <div className="landing-section__header">
             <div className='landing-section__header-left'>
-                <h2 className="landing-section__title">Community Favorites</h2>
-                <p className="landing-section__sub">Books our readers love most</p>
-            </div>
-            <div className='landing-section__header-right'>
-            <Link to='/books' className='landing-section__header-right__btn'>
-            View All
-            </Link>
+                <h2 className="landing-section__title">Editor's Picks</h2>
+                <p className="landing-section__sub">Featured Books for the month</p>
             </div>
           </div>
 
@@ -208,6 +226,12 @@ const LandingPage = () => {
               ))}
             </div>
           </div>
+          
+          <div className="landing-section__footer">
+            <Link to='/editors-picks' className='landing-section__header-right__btn'>
+              View All
+            </Link>
+          </div>
         </section>
       )}
 
@@ -225,10 +249,34 @@ const LandingPage = () => {
             <h2 className="landing-section__title">Trending in {trendingGenre}</h2>
             <p className="landing-section__sub">What readers are picking up right now</p>
           </div>
-          <div className="landing-strip">
-            {trendingBooks.map((book, i) => (
-              <BookCard key={book.googleBooksId ?? i} book={book} variant="minimal" />
-            ))}
+          <div className="landing-carousel">
+            <button
+              className="landing-carousel__arrow landing-carousel__arrow--prev"
+              onClick={() => scrollTrending('prev')}
+              disabled={!canScrollPrev}
+              aria-label="Scroll previous"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            <div
+              className="landing-strip"
+              ref={trendingRef}
+              onScroll={updateScrollState}
+            >
+              {trendingBooks.map((book, i) => (
+                <BookCard key={book.googleBooksId ?? i} book={book} variant="minimal" />
+              ))}
+            </div>
+
+            <button
+              className="landing-carousel__arrow landing-carousel__arrow--next"
+              onClick={() => scrollTrending('next')}
+              disabled={!canScrollNext}
+              aria-label="Scroll next"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
         </section>
       )}
@@ -237,18 +285,20 @@ const LandingPage = () => {
           <section className="landing-section">
               <Skeleton className="h-10 w-64 mb-4" />
               <div className="landing-bestsellers">
-                  {[1,2,3,4].map(i => <Skeleton key={i} className="h-20 w-full mb-2" />)}
+                  {[1,2,3].map(i => <Skeleton key={i} className="h-20 w-full mb-2" />)}
               </div>
           </section>
       ) : bestsellers.length > 0 && (
         <section className="landing-section">
           <div className="landing-section__header">
-            <h2 className="landing-section__title">Global Bestsellers</h2>
-            <p className="landing-section__sub">A definitive Ranking of world Literature</p>
+            <div className="landing-section__header-left">
+              <h2 className="landing-section__title">Global Bestsellers</h2>
+              <p className="landing-section__sub">A definitive Ranking of world Literature</p>
+            </div>
           </div>
 
           <div className="landing-bestsellers">
-            {bestsellers.slice(0, 8).map((book, i) => (
+            {bestsellers.slice(0, 3).map((book, i) => (
               <Link
                 key={book.googleBooksId ?? i}
                 to={`/books/${book.googleBooksId ?? book.id}`}
@@ -271,6 +321,12 @@ const LandingPage = () => {
                 </div>
               </Link>
             ))}
+          </div>
+          
+          <div className="landing-section__footer">
+            <Link to='/bestsellers' className='landing-section__header-right__btn'>
+              View All
+            </Link>
           </div>
         </section>
       )}
@@ -295,11 +351,11 @@ const LandingPage = () => {
               <div className="landing-author__works-list">
                 {AUTHOR_OF_MONTH.works.map((work) => (
                   <Link
-                    key={work}
-                    to={`/search?query=${encodeURIComponent(work)}`}
+                    key={work.googleId}
+                    to={`/books/${work.googleId}`}
                     className="landing-author__work"
                   >
-                    {work}
+                    {work.title}
                   </Link>
                 ))}
               </div>

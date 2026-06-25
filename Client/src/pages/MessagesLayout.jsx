@@ -240,7 +240,7 @@ const MessagesLayout = () => {
     )
   }, [])
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage size ='lg'/>
 
   const showList = !activeId
   const showChat = Boolean(activeId)
