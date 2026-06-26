@@ -2858,6 +2858,19 @@ body > .spinner {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
+/* add this alongside your other .editors-picks__ rules */
+.editors-picks__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+}
+.picks-card__cover {
+  width: 100%;   /* was 80% */
+  height: 100%;  /* was 80% */
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
 
 .editors-picks__title {
   font-size: clamp(2rem, 4vw, 3rem);

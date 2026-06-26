@@ -93,6 +93,14 @@ export const loginUser = asyncHandler(async (req, res) => {
   if (result.rows.length === 0) return res.status(400).json({ error: 'User does not exist. Create account' });
 
   const user = result.rows[0];
+  if (!user.passwordhash) {
+    return res.status(400).json({ 
+      error: 'This account was created with Google.',
+      authMethod: 'google',
+      canSetPassword: true,
+      email: user.email   // 👈 pass email so frontend can prefill
+    })
+  }
   const isMatch = await bcrypt.compare(password, user.passwordhash);
   if (!isMatch) return res.status(400).json({ error: "Invalid email or password" });
 
@@ -148,9 +156,10 @@ export const setNewPassword = asyncHandler(async (req, res) => {
   if (result.rows.length === 0) return res.status(400).json({ error: 'Code is invalid or expired.' });
 
   const user = result.rows[0];
-  const isSamePassword = await bcrypt.compare(newPassword, user.passwordhash);
+  if(user.passwordhash){
+    const isSamePassword = await bcrypt.compare(newPassword, user.passwordhash);
   if (isSamePassword) return res.status(400).json({ error: 'New password cannot be the same as your old password.' });
-
+  }
   const hashedPassword = await bcrypt.hash(newPassword, SaltRounds);
   await db.query(
     'UPDATE users SET passwordhash = $1, reset_token = NULL, token_expiry = NULL WHERE email = $2',
