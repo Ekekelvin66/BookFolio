@@ -99,6 +99,10 @@ const Register = () => {
               </svg>
               Continue with Google
             </button>
+            <p className="auth-page__switch">
+              Already have an account?{' '}
+              <Link to="/login" className="auth-page__switch-link">Login</Link>
+            </p>
           </div>
         )}
 

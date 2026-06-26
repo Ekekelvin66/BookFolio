@@ -14,9 +14,9 @@ const footerColumns = [
   {
     heading: 'Discover',
     links: [
-      { label: 'Bestsellers', path: '/search?filter=bestsellers' },
-      { label: 'New Releases', path: '/search?filter=new' },
-      { label: 'Staff Picks', path: '/search?filter=staff-picks' },
+      { label: 'Bestsellers', path: '/bestsellers' },
+      { label: 'New Releases', path: '/' },
+      { label: 'Staff Picks', path: '/editors-picks' },
     ],
   },
   {
