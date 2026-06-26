@@ -20,7 +20,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [unverified, setUnverified] = useState(null)
   const [googleAccountData, setGoogleAccountData] = useState(null)
-  const [activeTab, setActiveTab] = useState('email')
+  const [activeTab, setActiveTab] = useState('google')
   const redirect=searchParams.get('redirect') ?? ''
 
   const handleSubmit = async (e) => {

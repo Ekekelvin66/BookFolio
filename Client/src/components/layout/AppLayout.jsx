@@ -4,6 +4,7 @@ import { useAuthContext } from '../../context/AuthContext'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 import AppFooter from './AppFooter'
+import LandingFooter from './LandingFooter'
 
 const AppLayout=()=> {
   const { user, logout } = useAuthContext()
@@ -52,7 +53,7 @@ const AppLayout=()=> {
         <main className="app-layout__content">
           <Outlet />
         </main>
-        <AppFooter />
+        <LandingFooter />
       </div>
 
     </div>

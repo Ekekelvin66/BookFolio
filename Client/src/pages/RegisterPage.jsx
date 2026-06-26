@@ -20,7 +20,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [errors, setErrors] = useState({})
-  const [activeTab, setActiveTab] = useState('email')
+  const [activeTab, setActiveTab] = useState('google')
 
   const validate = () => {
     const newErrors = {}
