@@ -23,76 +23,63 @@ export const getGenres = asyncHandler(async (req, res) => {
   res.json({ genres: rows })
 })
 
+const PAGE_SIZE = 10
+
 export const getGenre = asyncHandler(async (req, res) => {
   const { genreName } = req.params
+  const page = Math.max(parseInt(req.query.page) || 1, 1)
+  const start = (page - 1) * PAGE_SIZE
+  const end = start + PAGE_SIZE
 
-  const genreResult = await db.query(
-    `SELECT * FROM genres WHERE name ILIKE $1`,
-    [genreName]
-  )
-
+  const genreResult = await db.query(`SELECT * FROM genres WHERE name ILIKE $1`, [genreName])
   if (genreResult.rows.length === 0) {
     return res.status(404).json({ error: 'Genre not found' })
   }
-
   const genre = genreResult.rows[0]
 
- 
-  const booksResult = await db.query(`
-    SELECT
-      books.id,
-      books.title,
-      books.author,
-      books.cover_url,
-      books.description,
-      ROUND(AVG(reviews.rating), 1) AS avg_rating,
-      COUNT(reviews.id)             AS review_count
+  const countResult = await db.query(`
+    SELECT COUNT(DISTINCT books.id) AS total
     FROM books
     JOIN book_genres ON book_genres.book_id = books.id
-    JOIN genres      ON genres.id = book_genres.genre_id
-    LEFT JOIN reviews ON reviews.book_id = books.id
-    WHERE genres.id = $1
-    GROUP BY books.id
-    ORDER BY avg_rating DESC NULLS LAST, review_count DESC
-    LIMIT 20
+    WHERE book_genres.genre_id = $1
   `, [genre.id])
+  const dbCount = parseInt(countResult.rows[0].total)
 
-  let discoveryBooks = []
-  if (booksResult.rows.length <5 ) {
-    const validGenres = await getValidGenres();
-    discoveryBooks = await searchGoogleBooks('', genreName)
-    discoveryBooks = discoveryBooks.map((b) => ({
-      ...b,
-      genre: matchGenre(b.genre, genreName, validGenres)
-    }));
+  const dbStart = Math.max(start, 0)
+  const dbEnd = Math.min(end, dbCount)
+  let dbBooks = []
+
+  if (dbStart < dbEnd) {
+    const booksResult = await db.query(`
+      SELECT books.id, books.title, books.author, books.cover_url, books.description,
+        ROUND(AVG(reviews.rating), 1) AS avg_rating,
+        COUNT(reviews.id) AS review_count
+      FROM books
+      JOIN book_genres ON book_genres.book_id = books.id
+      LEFT JOIN reviews ON reviews.book_id = books.id
+      WHERE book_genres.genre_id = $1
+      GROUP BY books.id
+      ORDER BY avg_rating DESC NULLS LAST, review_count DESC
+      LIMIT $2 OFFSET $3
+    `, [genre.id, dbEnd - dbStart, dbStart])
+    dbBooks = booksResult.rows.map((b) => ({ ...b, source: 'library' }))
   }
 
-  res.json({
-    genre,
-    books: booksResult.rows,
-    discovery: discoveryBooks,
-  })
-})
-
-
-export const getMoreGenreBooks = asyncHandler(async (req, res) => {
-  const { genreName } = req.params
-  const page = parseInt(req.query.page) || 1
-  const startIndex = (page - 1) * 10
-  const excludeIds = req.query.exclude
-    ? new Set(req.query.exclude.split(',').filter(Boolean))
-    : new Set()
-
-  const validGenres = await getValidGenres();
-  let books = await searchGoogleBooks('', genreName, startIndex)
-  // Apply filtering
-  books = books.map((b) => ({
+  const apiNeeded = PAGE_SIZE - dbBooks.length
+  let apiBooks = []
+  if (apiNeeded > 0) {
+    const apiStartIndex = Math.max(start - dbCount, 0)
+    const validGenres = await getValidGenres()
+    const apiResults = await searchGoogleBooks('', genreName, apiStartIndex, apiNeeded)
+    apiBooks = apiResults.map((b) => ({
       ...b,
-      genre: matchGenre(b.genre, genreName, validGenres)
-  }));
-  
-  const fresh = books.filter((b) => !excludeIds.has(b.googleBooksId))
-  res.json({ books: fresh })
+      source: 'api',
+      genre: matchGenre(b.genre, genreName, validGenres),
+    }))
+  }
+
+  const books = [...dbBooks, ...apiBooks]
+  res.json({ genre, books, page, hasMore: books.length === PAGE_SIZE })
 })
 
 

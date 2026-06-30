@@ -17,24 +17,23 @@ const enforceGap = async () => {
   lastRequestAt = Date.now()
 }
 
-const fetchWithRetry = async (query, genre, startIndex) => {
+const fetchWithRetry = async (query, genre, startIndex,maxResults) => {
   await enforceGap()
   try {
-    return await _search(query, genre, startIndex)
+    return await _search(query, genre, startIndex,maxResults)
   } catch (err) {
     const status = err?.response?.status
     if (status === 429) {
-      console.warn(`[GoogleBooks] 429 for "${query}/${genre}/${startIndex}" — retrying in ${RETRY_DELAY}ms`)
       await wait(RETRY_DELAY)
       await enforceGap()
-      return await _search(query, genre, startIndex)
+      return await _search(query, genre, startIndex,maxResults)
     }
     throw err
   }
 }
 
-export const searchBooks = async (query = '', genre = '', startIndex = 0) => {
-  const key = `${query}||${genre}||${startIndex}`
+export const searchBooks = async (query = '', genre = '', startIndex = 0,maxResults = 10) => {
+  const key = `${query}||${genre}||${startIndex}||${maxResults}`
 
   const cached = cache.get(key)
   if (cached && Date.now() < cached.expiresAt) {

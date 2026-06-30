@@ -6,39 +6,56 @@ import { getGoogleBookById } from '../services/googleBooks.js';
 import { buildBookResponse } from '../utils/BuildBookResponse.js';
 import { matchGenre } from '../utils/genreMatcher.js';
 
+const PAGE_SIZE = 10
+
 export const searchBooks = asyncHandler(async (req, res) => {
-  const { query, genre } = req.query;
+  const { query, genre } = req.query
+  const page = Math.max(parseInt(req.query.page) || 1, 1)
+  const start = (page - 1) * PAGE_SIZE
+  const end = start + PAGE_SIZE
 
-  const dbResult = await db.query(
-     `SELECT DISTINCT books.* 
-      FROM books
-      LEFT JOIN book_genres ON book_genres.book_id = books.id
-      LEFT JOIN genres ON genres.id = book_genres.genre_id
-      WHERE 
-      (books.title ILIKE $1 OR books.author ILIKE $1)
-      AND ($2::text IS NULL OR genres.name ILIKE $2)`,
+  const countResult = await db.query(
+    `SELECT COUNT(DISTINCT books.id) AS total
+     FROM books
+     LEFT JOIN book_genres ON book_genres.book_id = books.id
+     LEFT JOIN genres ON genres.id = book_genres.genre_id
+     WHERE (books.title ILIKE $1 OR books.author ILIKE $1)
+     AND ($2::text IS NULL OR genres.name ILIKE $2)`,
     [`%${query}%`, genre ?? null]
-  );
+  )
+  const dbCount = parseInt(countResult.rows[0].total)
 
-  if (dbResult.rows.length >0 ) {
-    return res.json({source:'database',books:dbResult.rows})
+  const dbStart = Math.max(start, 0)
+  const dbEnd = Math.min(end, dbCount)
+  let dbBooks = []
+
+  if (dbStart < dbEnd) {
+    const dbResult = await db.query(
+      `SELECT DISTINCT books.*
+       FROM books
+       LEFT JOIN book_genres ON book_genres.book_id = books.id
+       LEFT JOIN genres ON genres.id = book_genres.genre_id
+       WHERE (books.title ILIKE $1 OR books.author ILIKE $1)
+       AND ($2::text IS NULL OR genres.name ILIKE $2)
+       ORDER BY books.id
+       LIMIT $3 OFFSET $4`,
+      [`%${query}%`, genre ?? null, dbEnd - dbStart, dbStart]
+    )
+    dbBooks = dbResult.rows.map((b) => ({ ...b, source: 'library' }))
   }
 
-  const apiResults = await searchGoogleBooks(query, genre);
-  res.json({ source: 'api', books: apiResults });
-});
+  const apiNeeded = PAGE_SIZE - dbBooks.length
+  let apiBooks = []
+  if (apiNeeded > 0) {
+    const apiStartIndex = Math.max(start - dbCount, 0)
+    const apiResults = await searchGoogleBooks(query, genre, apiStartIndex, apiNeeded)
+    apiBooks = apiResults.map((b) => ({ ...b, source: 'api' }))
+  }
 
-export const searchMoreBooks = asyncHandler(async (req, res) => {
-  const { query, genre, startIndex, exclude } = req.query
-  const start = parseInt(startIndex) || 0
-  const excludeIds = exclude
-    ? new Set(exclude.split(',').filter(Boolean))
-    : new Set()
-
-  const books = await searchGoogleBooks(query ?? '', genre ?? '', start)
-  const fresh = books.filter((b) => !excludeIds.has(b.googleBooksId))
-  res.json({ books: fresh })
+  const books = [...dbBooks, ...apiBooks]
+  res.json({ books, page, hasMore: books.length === PAGE_SIZE })
 })
+
 
 export const getAllBooks = asyncHandler(async (req, res) => {
   let apiResults = [];

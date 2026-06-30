@@ -38,7 +38,6 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   res.status(201).json({ message: 'Check your email for a 6-digit verification code!' });
 
-  // send in background — fixed: was passing undefined `token`
   sendVerifyEmail(email, verific_code).catch((err) => {
     console.error('Failed to send verification email:', err);
   });
@@ -73,7 +72,7 @@ export const resendVerification = asyncHandler(async (req, res) => {
   if (!user) return res.status(404).json({ error: "No account found with that email." });
   if (user.is_verified) return res.status(400).json({ message: "Account already verified. Please login." });
 
-  const newCode = generateCode(); // fixed: was generating hex token
+  const newCode = generateCode(); 
   const newExpiry = new Date(Date.now() + 3600000);
 
   await db.query(
@@ -98,7 +97,7 @@ export const loginUser = asyncHandler(async (req, res) => {
       error: 'This account was created with Google.',
       authMethod: 'google',
       canSetPassword: true,
-      email: user.email   // 👈 pass email so frontend can prefill
+      email: user.email  
     })
   }
   const isMatch = await bcrypt.compare(password, user.passwordhash);

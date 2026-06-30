@@ -10,10 +10,13 @@ import clsx from 'clsx'
 import BookSearchCombobox from '../components/ui/BookSearchbox'
 import GenreDropdown from '../components/ui/Genredropdown'
 import Skeleton from '../components/ui/Skeleton'
+import Carousel from '../components/ui/Carousel'
+import { useToast } from '../context/ToastContext'
+import LandingNavbar from '../components/layout/landingNavbar'
 
 const AUTHOR_OF_MONTH = {
   name: 'Chimamanda Ngozi Adichie',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Chimamanda_Ngozi_Adichie_2015.jpg/440px-Chimamanda_Ngozi_Adichie_2015.jpg',
+  image: 'https://tse2.mm.bing.net/th/id/OIP.oGbSxOzXkVIjPEEbER5UxgHaI_?cb=thfc1falcon3&rs=1&pid=ImgDetMain&o=7&rm=3',
   quote: 'The single story creates stereotypes, and the problem with stereotypes is not that they are untrue, but that they are incomplete.',
   bio: 'Nigerian author of novels, nonfiction and short stories. Known for works exploring the African experience.',
   works: [
@@ -45,54 +48,37 @@ const JOURNEY_STEPS = [
 const LandingPage = () => {
   const navigate = useNavigate()
   const { getGuestHomeEssential, getGuestHomeExtended, loading, loadingExtended } = useHome()
-  const trendingRef = useRef(null)
+  const {showToast}= useToast()
 
-  const [canScrollPrev, setCanScrollPrev] = useState(false)
-  const [canScrollNext, setCanScrollNext] = useState(false)
-  const [clubs]=useState([])
   const [communityBooks, setCommunityBooks] = useState([])
   const [trendingBooks, setTrendingBooks] = useState([])
   const [trendingGenre, setTrendingGenre] = useState('')
   const [bestsellers, setBestsellers] = useState([])
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+
+  
   useEffect(() => {
     const fetchData = async () => {
-      const essential = await getGuestHomeEssential()
+      const [essential, extended] = await Promise.all([
+        getGuestHomeEssential(),
+        getGuestHomeExtended(),
+      ])
       if (essential.success) {
         setCommunityBooks(essential.data.communityBooks ?? [])
       }
-
-      const extended = await getGuestHomeExtended()
+      else{
+        showToast(essential.error,'error')
+      }
       if (extended.success) {
         setTrendingBooks(extended.data.trendingBooks ?? [])
         setTrendingGenre(extended.data.trendingGenre ?? '')
         setBestsellers(extended.data.bestsellers ?? [])
+      }else{
+        showToast(extended.error,'error')
       }
     }
     fetchData()
   }, [])
   
-
-  const handleSearch = (query) => {
-    navigate(`/search?query=${encodeURIComponent(query)}`)
-  }
-  const updateScrollState = () => {
-    const el = trendingRef.current
-    if (!el) return
-    setCanScrollPrev(el.scrollLeft > 4)
-    setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
-  }
-
-  useEffect(() => {
-    updateScrollState()
-  }, [trendingBooks])
-
-  const scrollTrending = (direction) => {
-    const el = trendingRef.current
-    if (!el) return
-    const amount = el.clientWidth * 0.85
-    el.scrollBy({ left: direction === 'next' ? amount : -amount, behavior: 'smooth' })
-  }
 
   const featuredBook = communityBooks[0] ?? null
   const secondaryBooks = communityBooks.slice(1, 3)
@@ -102,53 +88,7 @@ const LandingPage = () => {
   return (
     <div className="landing">
 
-      <header className="landing-nav">
-
-        <Logo className="landing-nav__logo-normal" />
-
-        <BookSearchCombobox
-          placeholder="Search for books..."
-          onSearch={handleSearch}
-          className="landing-nav__search"
-        />
-
-        <div className="landing-nav__right">
-          <Link to="/login" className="landing-nav__link">Sign In</Link>
-          <Link to="/register" className="landing-nav__cta">Get Started</Link>
-        </div>
-
-        <div className="landing-nav__top">
-          <div className="landing-nav__top-left">
-            <button
-              className="landing-nav__search-toggle"
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-              aria-label="Search"
-            >
-              <Search size={20} />
-            </button>
-          </div>
-          <div className="landing-nav__top-center">
-            <Logo className="landing-nav__logo" />
-          </div>
-          <div className="landing-nav__top-right">
-            <Link to="/login" className="landing-nav__link">Sign In</Link>
-          </div>
-        </div>
-
-        <div className={clsx("landing-nav__search-container", isSearchOpen && "is-open")}>
-          <BookSearchCombobox
-            placeholder="Search for books..."
-            onSearch={handleSearch}
-            className="landing-nav__search"
-          />
-        </div>
-
-        <div className="landing-nav__bottom">
-          <Link to="/register" className="landing-nav__cta">Get Started</Link>
-        </div>
-
-      </header>
-
+      <LandingNavbar/>
 
       <section className="landing-hero">
         <p className="landing-hero__eyebrow">For the modern scholar</p>
@@ -168,7 +108,7 @@ const LandingPage = () => {
           </Link>
         </div>
       </section>
-
+      
       {communityBooks.length > 0 && (
         <section className="landing-section">
           <div className="landing-section__header">
@@ -249,35 +189,11 @@ const LandingPage = () => {
             <h2 className="landing-section__title">Trending in {trendingGenre}</h2>
             <p className="landing-section__sub">What readers are picking up right now</p>
           </div>
-          <div className="landing-carousel">
-            <button
-              className="landing-carousel__arrow landing-carousel__arrow--prev"
-              onClick={() => scrollTrending('prev')}
-              disabled={!canScrollPrev}
-              aria-label="Scroll previous"
-            >
-              <ChevronLeft size={20} />
-            </button>
-
-            <div
-              className="landing-strip"
-              ref={trendingRef}
-              onScroll={updateScrollState}
-            >
-              {trendingBooks.map((book, i) => (
-                <BookCard key={book.googleBooksId ?? i} book={book} variant="minimal" />
-              ))}
-            </div>
-
-            <button
-              className="landing-carousel__arrow landing-carousel__arrow--next"
-              onClick={() => scrollTrending('next')}
-              disabled={!canScrollNext}
-              aria-label="Scroll next"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+         <Carousel>
+          {trendingBooks.map((book, i) => (
+            <BookCard key={book.googleBooksId ?? i} book={book} variant="minimal" />
+          ))}
+        </Carousel>
         </section>
       )}
 
@@ -339,10 +255,12 @@ const LandingPage = () => {
 
         <div className="landing-author">
           <div className="landing-author__left">
+            
+            <div className='landing-author__image' ><img src={AUTHOR_OF_MONTH.image} alt="" /></div>
           </div>
           <div className="landing-author__right">
             <h3 className="landing-author__name">{AUTHOR_OF_MONTH.name}</h3>
-            <p className="landing-author__bio">{AUTHOR_OF_MONTH.bio}</p>
+            <p className="landing-author__bio">{AUTHOR_OF_MONTH.bio}</p>           
             <blockquote className="landing-author__quote">
               "{AUTHOR_OF_MONTH.quote}"
             </blockquote>
@@ -363,43 +281,6 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-
-      {clubs.length > 0 && (
-        <section className="landing-section">
-          <div className="landing-section__header">
-            <h2 className="landing-section__title">Active Literary Circles</h2>
-            <p className="landing-section__sub">
-              Join readers who are passionate about the same books
-            </p>
-          </div>
-          <div className="landing-clubs">
-            {clubs.map((club) => (
-              <div key={club.id} className="landing-clubs__card">
-                <div className="landing-clubs__cover">
-                  {club.cover_url
-                    ? <img src={club.cover_url} alt={club.name} />
-                    : <Users size={24} />
-                  }
-                </div>
-                <div className="landing-clubs__info">
-                  <p className="landing-clubs__name">{club.name}</p>
-                  {club.current_book_title && (
-                    <p className="landing-clubs__book">
-                      Currently Reading: <em>{club.current_book_title}</em>
-                    </p>
-                  )}
-                  <p className="landing-clubs__members">
-                    {club.member_count} members
-                  </p>
-                </div>
-                <Link to={`/register?redirect=/clubs/${club.id}`} className="landing-clubs__join">
-                  Join Club
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
 
       <section className="landing-section">

@@ -45,7 +45,7 @@ const normalizeBook = (item) => {
                   };          
 };
 
-export const searchGoogleBooks = async (textQuery = '', genre = '', startIndex = 0) => {
+export const searchGoogleBooks = async (textQuery = '', genre = '', startIndex = 0,maxResults=10) => {
   const parts = [];
   if (textQuery) parts.push(textQuery);
   if (genre && genre !== 'All' && genre !== '') parts.push(`subject:"${genre}"`);
@@ -53,7 +53,7 @@ export const searchGoogleBooks = async (textQuery = '', genre = '', startIndex =
   const query = parts.length > 0 ? parts.join(' ') : 'subject:fiction';
 
   try {
-    const response = await axios.get(BASE_URL, { params: buildParams(query, { startIndex }) });
+    const response = await axios.get(BASE_URL, { params: buildParams(query, { startIndex,maxResults }) });
     return response.data.items?.map(normalizeBook) ?? [];
   } catch (err) {
     if (err.response?.status === 429) {

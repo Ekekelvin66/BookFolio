@@ -29,7 +29,7 @@ export const useBooks = ()=>{
             setLoading(false)
         }
     }
-const searchBooks = (query,genre)=>handleRequest((signal)=> api.get(`/books/search?query=${query??''}${genre? `&genre=${genre}`:''}`,{signal}),'Failed to search Books')
+const searchBooks = (query,genre,page=1)=>handleRequest((signal)=> api.get(`/books/search?query=${query??''}${genre? `&genre=${genre}`:''}&page=${page}`,{signal}),'Failed to search Books')
 const getBook = (bookId)=>handleRequest((signal)=>api.get(`/books/${bookId}`,{signal}),'Failed to load Book Details')
 const addToShelf = (bookData)=>handleRequest((signal)=>api.post(`/shelves`,bookData,{signal}),'Failed to add to Shelf')
 const updateShelf = (bookId,status)=>handleRequest((signal)=>api.patch(`/shelves/${bookId}/status`,{status},{signal}),'Failed to Change status')

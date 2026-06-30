@@ -34,9 +34,9 @@ const BookCard=({ book, variant = 'default', progress = null, className })=>{
               <BookOpen size={28} />
             </div>
           )}
-          {genre && (
-            <Badge variant="default" size="sm" className="book-card__genre">
-              {genre}
+          {book.source === 'library' && (
+            <Badge variant="primary" size="sm" className="book-card__library-badge">
+              Library
             </Badge>
           )}
         </div>

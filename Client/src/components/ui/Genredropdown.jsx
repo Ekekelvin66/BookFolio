@@ -3,23 +3,13 @@ import { Link } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import clsx from 'clsx'
 import api from '../../utils/api'
+import { useGenres } from '../../hooks/useGenres'
 
 const GenreDropdown = ({ className }) => {
-  const [genres, setGenres] = useState([])
+
+  const {genres}=useGenres()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef(null)
-
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const { data } = await api.get('/genres')
-        setGenres(data.genres ?? data ?? [])
-      } catch {
-        // fail silently — genre dropdown is non-critical
-      }
-    }
-    fetchGenres()
-  }, [])
 
   useEffect(() => {
     const handleOutside = (e) => {
