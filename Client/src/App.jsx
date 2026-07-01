@@ -7,6 +7,7 @@ import LandingLayout from './components/layout/LandingLayout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import GuestRoute from './components/layout/GuestRoute'
 import BookPage from './pages/BookPage'
+import OnboardingLayout from './components/layout/OnboardingLayout'
 import DashBoard from './pages/DashboardPage'
 import BestsellersPage from './pages/BestsellersPage'
 import Landing from './pages/LandingPage';
@@ -57,7 +58,9 @@ function App() {
 
         <Route path="/onboarding" element={
           <OnboardingRoute>
-            <Settings isOnboarding={true} />
+            <OnboardingLayout>
+              <Settings isOnboarding={true} />
+            </OnboardingLayout>
           </OnboardingRoute>
         } />
 
