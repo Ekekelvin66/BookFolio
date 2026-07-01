@@ -24,28 +24,31 @@ const ForgotPasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [error, setError] = useState('')
+  const [editingEmail, setEditingEmail] = useState(false)
+  const [errors, setErrors] = useState({})
 
   const validateEmail = () => {
-    if (!email.trim()) return 'Email is required'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Enter a valid email address'
-    return null
+    const newErrors = {}
+    if (!email.trim()) newErrors.email = 'Email is required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Enter a valid email address'
+    return newErrors
   }
 
   const validateReset = () => {
-    if (!code.trim()) return 'Please enter the code from your email'
-    if (code.length !== 6) return 'Code must be 6 digits'
-    if (!newPassword) return 'Password is required'
-    if (newPassword.length < 8) return 'Password must be at least 8 characters'
-    if (newPassword !== confirmPassword) return 'Passwords do not match'
-    return null
+    const newErrors = {}
+    if (!code.trim()) newErrors.code = 'Please enter the code from your email'
+    else if (code.length !== 6) newErrors.code = 'Code must be 6 digits'
+    if (!newPassword) newErrors.newPassword = 'Password is required'
+    else if (newPassword.length < 8) newErrors.newPassword = 'Password must be at least 8 characters'
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
+    return newErrors
   }
 
   const handleSendCode = async (e) => {
     e.preventDefault()
-    setError('')
+    setErrors({})
     const validationError = validateEmail()
-    if (validationError) { setError(validationError); return }
+    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return }
 
     const result = await forgotPassword(email)
     if (!result.success) { showToast(result.error, 'error'); return }
@@ -81,16 +84,30 @@ const ForgotPasswordPage = () => {
               </h1>
               <p className="panel-desc">
                 {isSettingPassword
-                  ? "We'll send a 6-digit code to your email so you can set a password for your account."
-                  : "Enter your email and we'll send you a 6-digit reset code."
-                }
+                  ? (
+                      <>We'll send a 6-digit verification code to <strong>{email}</strong> so you can set your account password </>
+                    )
+                  : emailParam
+                    ? (
+                        <> We'll send a 6-digit reset code to <strong>{email}</strong>.</>
+                      )
+                    :(
+                      "Enter your email and we'll send you a 6-digit reset code."
+                    )}
               </p>
 
               <form className="auth-page__form" onSubmit={handleSendCode}>
-                {(emailParam || isSettingPassword) ? (    // 👈 also skip input when setting password
-                  <p className="panel-desc">
-                    Sending code to <strong>{email}</strong>
-                  </p>
+                {(emailParam || isSettingPassword) &&!editingEmail ? (    // 👈 also skip input when setting password
+                <p className="auth-page__notyou">
+                  <Button
+                    type="button"
+                    variant=''
+                    className="auth-page__switch-link"
+                    onClick={() => setEditingEmail(true)}
+                  >
+                    Not your account?
+                  </Button>
+                </p>
                 ) : (
                   <Input
                     id="email"
@@ -101,11 +118,11 @@ const ForgotPasswordPage = () => {
                     placeholder="you@example.com"
                     leftIcon={<Mail size={16} />}
                     fullWidth
-                    error={error}
+                    error={errors.email}
                   />
                 )}
                 <Button type="submit" variant="primary" fullWidth isLoading={loading}>
-                  {isSettingPassword ? 'Send Code' : 'Send Reset Code'}   {/* 👈 */}
+                  {isSettingPassword ? 'Send Code' : 'Send Reset Code'}  
                 </Button>
               </form>
 
@@ -126,15 +143,10 @@ const ForgotPasswordPage = () => {
               </p>
 
               <form className="auth-page__form" onSubmit={handleResetPassword}>
-                <Input
-                  id="code"
-                  type="text"
-                  label="6-digit code"
+               <CodeInput
                   value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="••••••"
-                  fullWidth
-                  error={error}
+                  onChange={setCode}
+                  error={errors.code}
                 />
                 <Input
                   id="newPassword"
@@ -149,6 +161,7 @@ const ForgotPasswordPage = () => {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   }
+                   error={errors.newPassword}
                 />
                 <Input
                   id="confirmPassword"
@@ -164,6 +177,7 @@ const ForgotPasswordPage = () => {
                       {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   }
+                  error={errors.confirmPassword}
                 />
                 <Button type="submit" variant="primary" fullWidth isLoading={loading}>
                   {isSettingPassword?'Set Password':'Reset Password'}
@@ -171,7 +185,7 @@ const ForgotPasswordPage = () => {
               </form>
 
               <p className="auth-page__switch">
-                <button className="auth-page__switch-link" onClick={() => setStep(1)}>
+                <button className="auth-page__switch-link" onClick={() => {setStep(1); setErrors({})}}>
                   <ArrowLeft size={14} /> Use a different email
                 </button>
               </p>

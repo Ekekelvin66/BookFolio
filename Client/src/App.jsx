@@ -15,7 +15,6 @@ import Register from './pages/RegisterPage';
 import VerifyEmail from './pages/VerifyEmailPage';
 import EditorsPicksPage from './pages/EditorsPicksPage'
 import ForgotPassword from './pages/ForgotPasswordPage';
-import ResetPassword from './pages/ResetPasswordPage';
 import OAuthCallback from './pages/OAuthCallback';
 import GenrePage from './pages/GenrePage'
 import Home from './pages/HomePage';
@@ -53,7 +52,6 @@ function App() {
           <Route path='/register' element={<GuestRoute><Register /></GuestRoute>} />
           <Route path='/verify-email' element={<GuestRoute><VerifyEmail /></GuestRoute>} />
           <Route path='/forgot-password' element={<GuestRoute><ForgotPassword /></GuestRoute>} />
-          <Route path='/reset-password' element={<GuestRoute><ResetPassword /></GuestRoute>} />
         </Route>
 
 
