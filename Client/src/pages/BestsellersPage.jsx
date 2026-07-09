@@ -24,7 +24,7 @@ const BestsellersPage = () => {
       <div className="bestsellers-page__hero">
         <h1 className="bestsellers-page__title">Global Bestsellers</h1>
         <p className="bestsellers-page__sub">
-          A definitive ranking of world literature, updated regularly to reflect
+          A definitive ranking of world literature, updated regularly inline with the New York times  to reflect
           the books shaping conversations globally.
         </p>
       </div>
