@@ -2,7 +2,6 @@ import { searchBooks } from '../services/googleBookCache.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 const BESTSELLERS = [
-  { title: 'Harvest Season',           author: 'Brynne Weaver' },
   { title: 'Whistler',                 author: 'Ann Patchett' },
   { title: 'Yesteryear',               author: 'Caro Claire Burke' },
   { title: 'The Calamity Club',        author: 'Kathryn Stockett' },
